@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<meta charset="UTF-8">
+<title>表单验证</title>
+<style type="text/css">
+*{ padding:0px; margin:0px; font:12px/1.5 "宋体","Arial","sans-seif","Tahoma"; color:#666;}
+ul,ol,li{ list-style:none;} 
+input,select,img{ vertical-align:middle;}
+label{ vertical-align:middle;}
+input:focus,textrea:focus{ outline:none;}
+.btn{ border:none 0;}
+.mb10{ margin-bottom:10px;}
+
+/*main*/
+form{ width:740px; height:500px; margin:100px auto;}
+form div{ overflow:hidden; clear:both;}
+form div label{ float:left; clear:both;}
+form div label .text{ width:152px; height:26px; padding:0 2px; border:1px solid #ccc;}
+form div label b{ font-weight:normal; font-size:12px; color:#ccc; visibility:hidden;}
+form div em{ display:inline-block; font-size:12px; text-align:center; color:#fff; vertical-align:middle; font-style:normal; width:53px; height:15px; line-height:15px; background:#FFD099;}
+form div .active{ background-color:#FF6600;}
+div span{ display:inline-block; width:80px; text-align:right; }
+.submitBtn{ width:135px; height:33px; background:#CCC; margin:20px 0 0 80px;}
+.changeimg{ width:22px; height:22px; display:inline-block; vertical-align:middle; font-style:normal; width:53px;}
+.msg{ line-height:12px; color:#999; float:left; margin-left:5px; display:none; }
+.msg i{ display:inline-block; vertical-align:middle; width:25px; height:20px; background:url(images/ati.png) no-repeat; }
+.msg .ati{ background:url(images/ati.png) no-repeat; margin:5px 0px;}
+.msg .err{ background:url(images/err.png) no-repeat; margin:5px 0px;}
+.msg .ok{ background:url(images/ok.png) no-repeat; margin:5px 0px;}
+</style>
+<script type="text/javascript">
+window.onload=function(){	
+     var Form=document.getElementById("user");
+	  var Div=Form.getElementsByTagName('div');
+	  var aInput=Form.getElementsByTagName("input");
+	  var oName=aInput[0];
+	  var pwd=aInput[1];
+	  var repwd=aInput[2];
+	  var yzm=aInput[3];
+	  var aP=Form.getElementsByTagName('p');
+	  var name_msg=aP[0];
+	  var pwd_msg=aP[1];
+	  var repwd_msg=aP[2];
+	  var count=document.getElementById("count");
+	  var aEm=Form.getElementsByTagName('em');
+	  var name_length=0;
+	  
+	  //用户名验证
+	  oName.onfocus=function(){
+		 name_msg.style.display="block";
+        name_msg.innerHTML='<i class="ati"></i>5-25个字符，一个汉字为两个字符，推荐使用中文会员名';	 
+		  }
+		  
+	 oName.onkeyup=function(){
+		 //alert(2);
+		 count.style.visibility="visible";
+		 name_length=getLength(this.value);
+		 count.innerHTML=name_length+"个字符";
+		 if(name_length==0){
+			 count.style.visibility='hidden';
+			 }
+		  } 
+	 		 
+     oName.onblur=function(){
+		 // alert(1);
+		 /*判断字符长度以及用户名是否可用*/
+		 var len=getLength(this.value);
+		 //判断是否含有非法字符
+		 var re=/[^\w\u4e00-\u9fa5]/g;
+        if(re.test(this.value)){
+			name_msg.innerHTML='<i class="err"></i>含有非法字符';
+			}
+			//不能为空
+		else if(len==0){ name_msg.innerHTML='<i class="err"></i>不能为空'; }
+   		// alert(len);
+		else if(len<5||len>25){
+			 name_msg.innerHTML='<i class="err"></i>请输入5-25个字符';
+		 }
+		 else{ name_msg.innerHTML='<i class="ok"></i>ok'; }
+		  } 
+		  
+		 //密码验证 
+		pwd.onfocus=function(){
+			pwd_msg.style.display="block";
+           pwd_msg.innerHTML='<i class="ati"></i>请输入6-20位密码，请使用字母加数字或符号的组合密码，不能单独使用字母，数字或符号';	
+			
+			}  
+			pwd.onkeyup=function(){
+				aEm[0].className="active";
+				if(this.value.length>5){ 
+				   aEm[1].className="active";
+				   repwd.removeAttribute('disabled');
+				   repwd_msg.style.display="block";
+				}
+				else{
+					aEm[1].className="";
+				   repwd.setAttribute('disabled');
+				   repwd_msg.style.display="none";
+					}
+				if(this.value.length>10){
+					aEm[2].className="active";
+					}else{
+					aEm[2].className="";
+						}	
+				}
+		pwd.onblur=function(){
+			
+			var len=getLength(this.value);
+		 //判断是否含有非法字符
+		    var re=/[^\w\u4e00-\u9fa5]/g;
+			var re_n=/[^\d]/g;
+			var re_t=/[^a-zA-Z]/g;
+           if(re.test(this.value)){
+			pwd_msg.innerHTML='<i class="err"></i>含有非法字符';
+			  }
+			//不能为空
+		    else if(len==0){ pwd_msg.innerHTML='<i class="err"></i>不能为空'; }
+           //字符长度
+		    else if(len<6||len>20){
+			   pwd_msg.innerHTML='<i class="err"></i>请输入6-20个字符';
+		    }
+			
+			//不能用同样的字符
+			else if(findStr(this.value,this.value[0])==this.value.length){
+			  pwd_msg.innerHTML='<i class="err"></i>不能使用同样的字符';
+				}
+			//不能全为数字
+			else if(!re_n.test(this.value)){			
+			  pwd_msg.innerHTML='<i class="err"></i>不能全为数字';
+             }	
+			 //不能全为字母
+			else if(!re_t.test(this.value)){			
+			  pwd_msg.innerHTML='<i class="err"></i>不能全为字母';
+             }	
+		    else{ pwd_msg.innerHTML='<i class="ok"></i>ok'; }
+			
+			}  
+	//确认密码
+		 repwd.onblur=function(){
+			 if(this.value != pwd.value){
+				 repwd_msg.innerHTML='<i class="err"></i>和上面密码不一致，请重新输入';
+				 }
+				 else{
+				 repwd_msg.innerHTML='<i class="ok"></i>ok';
+					 }
+			 } 		  
+		  
+		   
+	}
+	function getLength(str){
+		 return str.replace(/[^\x00-xff]/g,"aa").length;
+		
+		}
+		
+	function findStr(str,n){
+		var tmp=0;
+		for(var i=0; i<str.length; i++){
+			if(str.charAt(i)==n) tmp++;
+			}
+			return tmp;
+		};	
+</script>
+</head>
+
+<body>
+<form id="user">
+<div><label><span>会员名:</span><input type="text" class="text"/></label><p class="msg"><i class="ati"></i>5-25个字符，一个汉字为两个字符，推荐使用中文会员名</p></div>
+<div><label><span></span><b id="count">0个字符</b></label></div>
+<div><label><span>登录密码:</span><input type="password" class="text"/></label><p class="msg"><i class="err"></i>5-25个字符</p></div>
+<div style="margin:3px 0 10px 0"><label><span></span><em>弱</em><em>中</em><em>强</em></label></div>
+<div style="margin-bottom:20px"><label><span>确认密码:</span><input type="password" class="text" disabled=""/></label><p class="msg"><i class="ok"></i>请重新再输入一次</p></div>
+<div><label><span>验证码:</span><input type="text" class="text" style="width:50px"/>
+<img src="images/logo.png" width="100" height="30"/><a class="changeimg" href="javascript:;" title="重新获取验证码"></a>
+</label></div>
+<div><input class="submitBtn btn" type="submit" value="同意协议并注册"/></div>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
